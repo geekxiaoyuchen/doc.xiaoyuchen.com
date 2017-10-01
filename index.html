@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>萧宇宸的个人技术栈</title>
+  <link rel="stylesheet" href="/assets/css/docute.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script src="/assets/js/docute.js"></script>
+  <script src="/assets/js/prism-php.js"></script>
+  <script>
+    docute.init({
+      url: '.',
+      url: 'http://doc.xiaoyuchen.com/',
+      tocVisibleDepth: 3,
+      nav: [
+        // homepage
+        {title: '首页', path: '/'},
+        // 技术
+        {title: 'Web开发', type: 'dropdown', items: [
+          {type: 'label', title: '前端开发'},
+          {title: 'Vue.js', path: '/web/frontend/Vue/'},
+          {type: 'sep'},
+          {type: 'label', title: '后端开发'},
+          {title: 'Yii2框架', path: '/web/backend/yii2/'},
+        ]},
+        {title: '移动开发', type: 'dropdown', items: [
+          {type: 'label', title: 'Android'},
+          {type: 'sep'},
+          {type: 'label', title: 'iOS'},
+        ]},
+        {title: '基础理论', type: 'dropdown', items: [
+          {type: 'label', title: '数据结构'},
+          {type: 'sep'},
+          {type: 'label', title: '概率论'},
+        ]},
+        {title: '项目文档', type: 'dropdown', items: [
+          {type: 'label', title: '开源项目'},
+          {type: 'sep'},
+          {type: 'label', title: '商业项目'},
+        ]},
+        {title: 'Mac使用', type: 'dropdown', items: [
+          {type: 'label', title: '佳软推荐'},
+          {type: 'sep'},
+          {type: 'label', title: '使用技巧'},
+        ]}
+      ],
+      icons: [{
+        icon: 'github',
+        label: '萧队长的Github',
+        link: 'https://github.com/geekxiaoyuchen/repo'
+      }],
+    })
+  </script>
+</body>
+</html>
