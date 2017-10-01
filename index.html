@@ -8,9 +8,21 @@
   <link rel="stylesheet" href="/assets/css/docute.css">
 </head>
 <body>
-  <div id="app"></div>
+
+  <div id="app">
+  </div>
+  <div id="shang" class="main-content-wrap">
+      <a class="gave-a shang" style="width:80px;background:red;height:80px;text-align:center;line-height:80px;font-size:28px;border-radius:40px;margin:0 auto;margin-top:30px;color:#fff;display:block" href="javascript:void(0);">赏</a>
+  </div>
   <script src="/assets/js/docute.js"></script>
+  <!-- to see all the theme: https://unpkg.com/prismjs@1.8.1/components/ -->
   <script src="/assets/js/prism-php.js"></script>
+  <script src="/assets/js/prism-bash.js"></script>
+  <script src="/assets/js/prism-javascript.js"></script>
+  <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+  <script src="/assets/layer/layer.js"></script>
+  <script src="/assets/js/shang.js"></script>
+
   <script>
     docute.init({
       url: '.',
@@ -46,12 +58,21 @@
           {type: 'label', title: '佳软推荐'},
           {type: 'sep'},
           {type: 'label', title: '使用技巧'},
-        ]}
+          {title: '我的Mac开发环境', path: '/mac/dev/'}
+        ]},
+        {title: '主题阅读', type: 'dropdown', items: [
+          {type: 'label', title: '个人管理'},
+          {title: '永澄老师', path: '/read/ycmaster/'},
+          {type: 'sep'},
+          {type: 'label', title: '精读书目'},
+          {title: '2017年书单', path: '/read/book/'},
+        ]},
+        {title: '打赏', path: 'http://doc.xiaoyuchen.com/donate.html'},
       ],
       icons: [{
         icon: 'github',
         label: '萧队长的Github',
-        link: 'https://github.com/geekxiaoyuchen/repo'
+        link: 'https://github.com/geekxiaoyuchen'
       }],
     })
   </script>
