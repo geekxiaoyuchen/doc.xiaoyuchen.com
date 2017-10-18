@@ -1,5 +1,5 @@
 # 《精通Yii框架》
-## 一、项目概述
+## 项目概述
 ### （一）灵感来源
 近段时间，一直在学习Yii框架，读了一些英文资料，其中有一本[《Mastering Yii》](https://www.masteringyii.com)，写的非常棒，所以想把这本书翻译成中文，算是自己阅读学习笔记，也可以帮到更多的中文Yii开发者。
 
@@ -14,7 +14,7 @@
 ### （三）写作时间
 因为是业余时间做这件事，所以，更新的频率不会高，初步定为每周更新1个小节，后面如果时间允许可以加快速度。
 
-## 第一章：Composer,配置,类,路径别名
+## 第1章:Composer,配置,类,路径别名
 
 在正式开始学习Yii框架之前，我们需要先来看看Yii是如何安装，如何配置，核心构建模块有哪些。在这章，我们将讨论如何安装Yii框架并且通过一个叫Composer的包管理工具来构建应用。我们还将讨论一些Yii2和Web服务器通用的配置，包括配置应用程序运行环境等。
 
@@ -446,9 +446,226 @@ cp –R config/env/dev config/env/prod
 通过以上这些配置，我们的应用程序更加灵活与健壮，在后面的学习中，你会看到这些配置将大大简化我们部署的程序。
 
 ### (三)组件和对象
+有两个牛B闪闪的类，几乎Yii2所有的类都是继承这两个类，它们是Component和Object。
+
 #### 1.组件
+
+Yii2使用Component类取代Yii1中的CComponent类。在Yii1中，组件充当定位器作用，用来提供不同的处理请求的服务。在Yii2中，每个组件可以使用下面的语法来访问：
+
+```php
+Yii::$app->componentID 
+```
+例如，数据库组件可以这样来访问：
+
+```php
+Yii::$app->db 
+```
+缓存组件可以这样来访问：
+
+```php
+Yii::$app->cache 
+```
+
+Yii2在运行时，通过应用程序配置文件中的名称来自动注册每个组件。
+
+为了提高性能，Yii2组件使用懒加载模式，也就是说当第一次被访问时才会被加载。这就是说，如果缓存组件没有在你的代码中使用，那么这个组件就不会被加载到内存。有些时候，这个模式是非理想的，所以，强制加载一个组件，你可以通过bootstrap配置项来添加需要初始化的组件，可以在config/web.php或者config/console.php中进行配置。例如，我们想初始化日志组件，我们可以这样来配置：
+
+```php
+<?php return [
+	'bootstrap' => [ 
+	'log' ],
+	[...] 
+]
+```
+bootstrap选项类似于Yii1中的预加载项。所有出现在这里的组件都会第一时间被加载，而不论是否会被用到。
+
+
 #### 2.对象
+在Yii2中，几乎所有的类，除了继承自Component类之外，都是继承自Object类。Object类实现了一些基础属性。在Yii2中，属性可以访问许多关于类的信息。例如：__get和__set魔术方法，还有工具函数，如hasProperty(),canGetProperty(),canSetProperty().这使得Yii2中的类异常强大。
 
 ### (四)路径别名
+在Yii2中，路径别名用来代表文件路径或者URL路径，我们不用硬编码路径在代码里。在Yii2中，别名总是使用@符号开始，Yii以此和其他路径和URL区别开来。
 
+别名有多种定义方式。在简单的方法是调用\\Yii::setAlias():
+
+```php
+\\Yii::setAlias('@path', '/path/to/example');
+\\Yii::setAlias('@example, 'https://www.example.com'); 
+```
+别名还可以在应用配置文件中的aliases选项中定义：
+
+```php
+return [
+// ... 
+'aliases' => [
+   '@path => '/path/to/example,
+   '@example' => 'https://www.example.com', 
+], ];
+```
+使用Yii::getAlias()可以方便的调取到别名的值。
+
+```php
+\\Yii::getAlias('@example') // returns https://www.example.com
+```
+Yii2在很多地方可以识别路径别名。例如：yii\caching\FileCache能够识别$cachePath参数：
+
+```php
+$cache = new FileCache([
+   'cachePath' => '@runtime/cache', 
+]);
+```
 ### (五)小结
+在这章，我们学习了如何通过composer创建Yii应用程序。又学习了基础配置文件，如何配置Web应用程序，并且设置环境配置文件。最后，我们还学习组件、对象、路径别名，这些都是掌握Yii框架的基础知识。
+
+在下一章，我们将会继续学习控制台命令行和应用程序。
+
+## 第2章:控制命令行和应用程序
+
+在构建现代Web应用程序时，我们需要写一些后台任务来支持主应用程序。这些任务包括生产报告，发送邮件，或者web端数据分析。通过Yii2，我们通过控制命令行或者控制台应用程序来构建这些工具。
+
+### (一)配置及用法
+
+Yii2控制台应用程序和Web应用程序的结构非常相似。在Yii2，控制台命令行继承自yii\console\Controller，与yii\web\Controller一样。
+
+#### 1. 入口脚本
+
+在进入配置文件之前，我们先来看看控制入口脚本，它写在yii文件中。这个入口脚本是所有控制台命令行的初始化代码，通常来说，可以使用如下命令调用这个脚本：
+
+```bash
+$ ./yii
+```
+这个命令会输出系统所有现有变量。类似web/index.php入口脚本，但是，还未能识别环境。我们可以使用如下代码修改yii文件：
+
+```bash
+#!/usr/bin/env php
+```
+```php
+<?php
+/** 
+ * Yii console bootstrap file.
+*/ 
+
+// Define our application_env variable as provided by nginx/apache 
+
+if (!defined('APPLICATION_ENV'))
+{ 
+	if (getenv('APPLICATION_ENV') != false)
+		define('APPLICATION_ENV', getenv('APPLICATION_ENV')); 
+	else
+		define('APPLICATION_ENV', 'prod'); 
+}
+
+$env = require(__DIR__ . '/config/env.php');
+defined('YII_DEBUG') or define('YII_DEBUG', $env['debug']); 
+
+// fcgi doesn't have STDIN and STDOUT defined by default
+defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
+defined('STDOUT') or define('STDOUT', fopen('php://stdout', 'w')); 
+
+require(__DIR__ . '/vendor/autoload.php');
+require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php'); 
+
+$config = require(__DIR__ . '/config/console.php'); 
+
+$application = new yii\console\Application($config);
+$exitCode = $application->run();
+exit($exitCode);
+```
+这样，我们就搞定了入口脚本配置文件。下面我们来看看应用程序配置文件。
+
+#### 2. 配置
+
+在Yii2，控制台配置文件位于config/console.php文件中，这与我们的web配置文件类似。
+
+```php
+<?php
+
+Yii::setAlias('@tests', dirname(__DIR__) . '/tests'); 
+
+return [
+       'id' => 'basic-console',
+       'basePath' => dirname(__DIR__),
+       'bootstrap' => ['log'],
+       'controllerNamespace' => 'app\commands',
+       'components' => [ 
+
+'cache' => [
+       'class' => 'yii\caching\FileCache', 
+],
+'log' => [
+ 	'targets' => [
+                 	[
+						'class' => 'yii\log\FileTarget', 
+
+ 						'levels' => ['error', 'warning'],
+                    ], 
+], ],
+
+ 'db' => require(__DIR__ . '/db.php'),
+       ], 
+ 'params' => require(__DIR__ . '/params.php'),
+   ];
+```
+像我们的Web配置文件，我们可以包含数据库和参数配置文件，使用第1章环境敏感的配置，Composer，Configuration，Classess，和Path Aliases.事实上，web和控制台配置文件的主要不同是明白声明控制台命名空间和@test别名，这指名了测试文件的位置。
+
+#### 3. 设置控制台环境变量
+按照Web应用程序的惯例，我们要设置APPLICATION_ENV环境变量。在命令行，我们可以通过如下命令来设置环境变量。
+
+```bash
+export APPLICATION_ENV="dev"
+```
+使用如下命令来测试是否设置成功：
+
+```bash
+echo $APPLICATION_ENV 
+```
+如果设置成功，你会在屏幕上得到如下输出。
+
+```bash
+dev
+```
+#### 4. 运行控制台命令
+
+现在我们的控制台应用程序已经配置好，我们要以简单的通过如下命令来执行控制台应用：
+
+```bash
+$ ./yii
+```
+如果你对Yii1熟悉的话，这条命令现在已经替换了/yiic。没有任何参数，使用/yii help可以获得帮助菜单，列出所有内建的控制台命令。
+
+```bash
+$ ./yii
+```
+Yii为每个默认命令提供帮助。例如，如果我们想看缓存里的子命令，我们可以使用下面的命令：
+
+```bash
+$ ./yii help cache
+```
+通常来说，我们可以使用如下Yii控制台模式：
+
+```bash
+$ ./yii <route> [--option1=value1 --option2=value2 ... argument1 argument2 ...] 
+```
+这里，<route>指明了希望运行的控制器和方法。例如如果我们想清空控制台的缓存，我们可以运行如下命令：
+
+```bash
+$ ./yii cache/flush-all
+```
+这会输出如下内容：
+
+```bash
+The following cache components were processed:
+
+* cache (yii\caching\FileCache) 
+```
+./yii命令也允许我们使用如下命令来实现同样的功能：
+
+```bash
+$ ./yii <route> --appconfig=path/to/config.php 
+```
+不需要我们修改任何代码，我们可以简单的指导Yii使用配置文件，包含了一切，引用另外的数据库或缓存，或者做更复杂的如不同的控制器命名空间。这个选项在我们创建既有前端又有后端应用程序，需要切换不同数据库时会非常有用。
+
+### (二)内建控制命令行
+### (三)创建控制命令行
+### (四)小结
+
